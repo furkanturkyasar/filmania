@@ -1,0 +1,25 @@
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+<!--    <item android:drawable="@android:color/white" />-->
+
+<!--    <item-->
+<!--        android:width="240dp"-->
+<!--        android:height="240dp"-->
+<!--        android:drawable="@android:color/transparent"-->
+<!--        android:gravity="center">-->
+<!--        <shape-->
+<!--            android:shape="oval">-->
+<!--            <solid android:color="@android:color/black" />-->
+<!--        </shape>-->
+<!--    </item>-->
+
+<!--    <item-->
+<!--        android:width="120dp"-->
+<!--        android:height="40dp"-->
+<!--        android:drawable="@android:color/transparent"-->
+<!--        android:gravity="center">-->
+<!--        <bitmap-->
+<!--            android:src="@mipmap/ic_launcher"-->
+<!--            android:gravity="center" />-->
+<!--    </item>-->
+</layer-list>

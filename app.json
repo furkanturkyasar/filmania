@@ -1,4 +1,20 @@
 {
-  "name": "filmania",
-  "displayName": "filmania"
+  "name": "Filmania",
+  "displayName": "Filmania",
+  "Fonts": {
+    "Default": "DM Sans"
+  },
+  "FontSizes": {
+    "Small": 12,
+    "Medium": 16,
+    "Large": 20,
+    "Huge": 24
+  },
+  "Colors": {
+    "PrimaryDarkColor": "#1B212F",
+    "PrimaryLightColor": "#237DF8",
+    "TextColor": "#FDFEFE",
+    "ButtonColor": "#3A445E",
+    "StarColor": "#F5C518"
+  }
 }
