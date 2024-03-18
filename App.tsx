@@ -13,22 +13,19 @@ import {
 } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
-
 import HomeIcon from 'react-native-vector-icons/Octicons';
 import ExploreIcon from 'react-native-vector-icons/Octicons';
 import SavedIcon from 'react-native-vector-icons/Octicons';
 import SearchIcon from 'react-native-vector-icons/Octicons';
 import ProfileIcon from 'react-native-vector-icons/Ionicons';
 
-
 // [Internal]
-
 import HomeScreen from './src/pages/main';
 import ExploreScreen from './src/pages/explore';
-import {Colors, Fonts} from './app.json';
-import SplashScreen from 'react-native-splash-screen';
-import {Walkthrough} from './src/pages/walkthrough';
-
+import { Colors, Fonts } from './app.json';
+import { Walkthrough } from './src/pages/walkthrough';
+import LoginScreen from './src/pages/login';
+import { FIREBASE_AUTH } from './FireBaseConfig';
 
 function Saved() {
   return (
@@ -107,18 +104,29 @@ function HeaderRight() {
 
 function App(): React.JSX.Element {
   const Stack = createNativeStackNavigator();
+  
+  const user = FIREBASE_AUTH?.currentUser;
 
+  console.log({user})
 
   return (
     <GestureHandlerRootView style={{flex: 1}}>
       <NavigationContainer>
         <StatusBar translucent barStyle="dark-content" />
         <Stack.Navigator screenOptions={{ headerBackTitleVisible: true }}>
-          <Stack.Screen name="Walkthrough" component={Walkthrough} options={{ headerShown: false }} />
-          <Stack.Screen name='Main' component={MainScreens} options={{ 
-            title: "",
-            headerShown: false
-          }} />
+          {
+            user ? (
+              <Stack.Screen name='Main' component={MainScreens} options={{ 
+                title: "",
+                headerShown: false
+              }} />
+            )
+            :
+            <>
+              <Stack.Screen name="Walkthrough" component={Walkthrough} options={{ headerShown: false }} />
+              <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
+            </>
+          }
         </Stack.Navigator>
       </NavigationContainer>
     </GestureHandlerRootView>

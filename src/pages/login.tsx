@@ -1,0 +1,304 @@
+import { SafeAreaView, ScrollView, Text, View, StyleSheet, Dimensions, TextInput, Button, TouchableOpacity } from "react-native";
+import { CommonActions } from '@react-navigation/native';
+import { Colors } from '../../app.json';
+import React, { useEffect, useState } from 'react';
+import UserIcon from 'react-native-vector-icons/AntDesign';
+import EmailIcon from 'react-native-vector-icons/Fontisto';
+import PasswordIcon from 'react-native-vector-icons/MaterialIcons';
+import { useFormik } from 'formik';
+import * as Yup from 'yup';
+
+
+
+const { width, height } = Dimensions.get('screen')
+
+
+export default function LoginScreen({route, navigation}: any) {
+
+    const [showLogin, setShowLogin] = useState<Boolean | null>(null);
+    const [fullName, setFullName] = useState<string>('');
+    const [email, setEmail] = useState<string>('');
+    const [password, setPassword] = useState<string>('');
+    const [passwordCheck, setPasswordCheck] = useState<string>('');
+    const [hasError, setHasError] = useState<Boolean>(false);
+  
+    const validationSchema = Yup.object().shape({
+        fullName: Yup.string().min(5, 'Isim En az 5 karakter olmalı').required('Ad Soyad zorunlu'),
+        email: Yup.string().email('Geçersiz e-posta').required('E-posta zorunlu'),
+        password: Yup.string().min(6, 'Şifre en az 6 karakter olmalı').required('Şifre zorunlu'),
+        passwordCheck: Yup.string()
+            .oneOf([Yup.ref('password'), null], 'Şifreler eşleşmiyor')
+            .required('Şifre doğrulama zorunlu'),
+    });
+
+    useEffect(() => {
+        setShowLogin(route?.params?.isLogin)
+    }, [])
+
+    const formik = useFormik({
+        initialValues: { fullName: '', email: '', password: '', passwordCheck: '' },
+        validationSchema,
+        onSubmit: values => {
+            console.log(values);
+            // Firebase
+        },
+    });
+
+    
+    if (showLogin === null) {
+        return
+    }
+
+    function handleResetNav(isLogin: boolean) {
+        navigation.dispatch(
+            CommonActions.reset({
+                index: 0,
+                routes: [
+                    {
+                        name: "Login",
+                        params: {
+                            isLogin: isLogin
+                        }
+                    }
+                ],
+            })
+        )
+    }
+
+
+    function renderRegisterContent() {
+        return (
+            <View style={styles.registerContainer}>
+                <View style={{}}>
+                    <View style={styles.input}>
+                        <UserIcon name="user" size={16} color={Colors.TextColor} />
+                        <TextInput
+                            value={formik.values.fullName}
+                            maxLength={36}
+                            style={styles.inputText}
+                            onChangeText={formik.handleChange("fullName")}
+                            onBlur={formik.handleBlur("fullName")}
+                            placeholder="Ad Soyad"
+                            placeholderTextColor={Colors.TextColor}
+                        />
+                        <View style={{position: 'absolute', bottom: -22, left: 10 }}>
+                            {formik.touched.fullName && formik.errors.fullName &&
+                            <Text style={{color: 'red'}}>{formik.errors.fullName}</Text>}
+                        </View>
+                    </View>
+                    
+                    <View style={styles.input}>
+                        <EmailIcon name="email" size={16} color={Colors.TextColor} />
+                        <TextInput
+                            value={formik.values.email}
+                            maxLength={36}
+                            style={styles.inputText}
+                            onChangeText={formik.handleChange("email")}
+                            onBlur={formik.handleBlur("email")}
+                            placeholder="E-posta"
+                            placeholderTextColor={Colors.TextColor}
+                        />
+                        <View style={{position: 'absolute', bottom: -22, left: 10 }}>
+                            {formik.touched.email && formik.errors.email &&
+                            <Text style={{color: 'red'}}>{formik.errors.email}</Text>}
+                        </View>
+                    </View>
+                    <View style={styles.input}>
+                        <PasswordIcon name="key" size={16} color={Colors.TextColor} />
+                        <TextInput
+                            maxLength={36}
+                            style={styles.inputText}
+                            value={formik.values.password}
+                            onBlur={formik.handleBlur("password")}
+                            onChangeText={formik.handleChange("password")}
+                            placeholder="Şifre"
+                            placeholderTextColor={Colors.TextColor}
+                            secureTextEntry
+                        />
+                        <View style={{position: 'absolute', bottom: -22, left: 10 }}>
+                            {formik.touched.password && formik.errors.password &&
+                            <Text style={{color: 'red'}}>{formik.errors.password}</Text>}
+                        </View>
+                    </View>
+                    <View style={styles.input}>
+                        <PasswordIcon name="key" size={16} color={Colors.TextColor} />
+                        <TextInput
+                            style={styles.inputText}
+                            maxLength={36}
+                            onBlur={formik.handleBlur("passwordCheck")}
+                            value={formik.values.passwordCheck}
+                            onChangeText={formik.handleChange("passwordCheck")}
+                            placeholder="Şifreyi doğrula"
+                            placeholderTextColor={Colors.TextColor}
+                            secureTextEntry
+                        />
+                        <View style={{position: 'absolute', bottom: -22, left: 10 }}>
+                            {formik.touched.passwordCheck && formik.errors.passwordCheck &&
+                            <Text style={{color: 'red'}}>{formik.errors.passwordCheck}</Text>}
+                        </View>
+                    </View>
+                </View>
+                <View style={{flexDirection: "row", marginLeft: 10, marginTop: 20 }}>
+                    <Text style={{color: Colors.TextColor}}> 
+                        Zaten hesabım var.     
+                    </Text>
+                    <TouchableOpacity onPress={() => {
+                        handleResetNav(true)
+                    }} style={{ marginLeft: 5}}>
+                            <Text style={{color: Colors.PrimaryLightColor }}>
+                                GİRİŞ YAP
+                            </Text>
+                    </TouchableOpacity>
+                </View>
+                <View style={{ alignItems: "center" }}>
+                    <TouchableOpacity style={styles.buttonContainer} onPress={() => formik.handleSubmit()}>
+                        <Text style={{color: Colors.TextColor, textAlign: 'center', fontWeight: "700" }}>KAYDOL</Text>
+                    </TouchableOpacity>
+                </View>
+            </View>
+        )
+    }
+
+    function renderLoginContent() {
+        return (
+            <View style={styles.loginContainer}>
+                <View style={{}}>
+                    <View style={styles.input}>
+                        <UserIcon name="user" size={16} color={Colors.TextColor} />
+                        <TextInput
+                            value={formik.values.fullName}
+                            maxLength={36}
+                            style={styles.inputText}
+                            onChangeText={formik.handleChange("fullName")}
+                            placeholder="Ad Soyad"
+                            placeholderTextColor={Colors.TextColor}
+                        />
+                    </View>
+                    <View style={styles.input}>
+                        <EmailIcon name="email" size={16} color={Colors.TextColor} />
+                        <TextInput
+                            value={email}
+                            maxLength={36}
+                            style={styles.inputText}
+                            onChangeText={setEmail}
+                            placeholder="E-posta"
+                            placeholderTextColor={Colors.TextColor}
+                        />
+                    </View>
+                    <View style={styles.input}>
+                        <PasswordIcon name="key" size={16} color={Colors.TextColor} />
+                        <TextInput
+                            maxLength={36}
+                            style={styles.inputText}
+                            value={password}
+                            onChangeText={setPassword}
+                            placeholder="Şifre"
+                            placeholderTextColor={Colors.TextColor}
+                            secureTextEntry
+                        />
+                    </View>
+                </View>
+                <View style={{flexDirection: "row", marginLeft: 10, marginTop: 20 }}>
+                    <Text style={{color: Colors.TextColor}}> 
+                        Filmania'da yeniyim.    
+                    </Text>
+                    <TouchableOpacity onPress={() => {
+                        handleResetNav(false)
+                    }} style={{ marginLeft: 5}}>
+                            <Text style={{color: Colors.PrimaryLightColor }}>
+                                KAYDOL
+                            </Text>
+                    </TouchableOpacity>
+                </View>
+                <View style={{ alignItems: "center" }}>
+                    <TouchableOpacity style={[styles.buttonContainer, { bottom: -30}]} onPress={() => {
+                        console.log("clicked!")
+                    }}>
+                        <Text style={{color: Colors.TextColor, textAlign: 'center', borderBottomWidth: 1 , borderBottomColor: "red", fontWeight: "700" }}>GİRİŞ YAP</Text>
+                    </TouchableOpacity>
+                </View>
+            </View>
+        )
+    }
+
+    function renderContent() {
+        
+        return (
+            <View style={styles.wrapper}>
+                <View style={styles.header}>
+                    <Text style={{color: Colors.TextColor, fontSize: 35, textAlign: "center"}}>FILMANIA</Text>
+                </View>
+                <View style={styles.content}>
+                    {
+                        showLogin ?
+                        renderLoginContent()
+                        :
+                        renderRegisterContent()
+                    }
+                </View>
+            </View>
+        )
+    }
+
+    return (
+        <SafeAreaView style={styles.container}>
+            {renderContent()}
+        </SafeAreaView>
+    );
+}
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: Colors.PrimaryDarkColor
+    },
+    wrapper: {
+
+    },
+    header: {
+        height: "25%",
+        justifyContent: "center"
+    },
+    content: {
+        backgroundColor: "#23324D",
+        height: height,
+        borderTopLeftRadius: 50,
+        borderTopRightRadius: 50
+    },
+    input: {
+        //backgroundColor: "red",
+        height: 50,
+        borderRadius: 16,
+        borderColor: Colors.TextColor,
+        borderWidth: 1,
+        color: Colors.TextColor,
+        padding: 10,
+        marginBottom: 26,
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 10,
+        position: 'relative'
+    },
+    inputText: {
+        color: Colors.TextColor,
+        width: "80%"
+    },
+    registerContainer: {
+        //backgroundColor: "red"
+        marginTop: 60,
+        margin: 30,
+    },
+    buttonContainer: {
+        height: 30,
+        width: 100,
+        justifyContent: "center",
+        textAlign: 'center',
+        borderBottomColor: Colors.PrimaryLightColor,
+        borderBottomWidth: 2,
+        marginTop: 30
+    },
+    loginContainer: {
+        marginTop: 60,
+        margin: 30,
+    }
+});
