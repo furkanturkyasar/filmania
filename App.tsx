@@ -3,13 +3,15 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import 'react-native-gesture-handler';
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   StatusBar,
   StyleSheet,
   View,
-  Text
+  Text,
+  ActivityIndicator
 } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
@@ -104,29 +106,48 @@ function HeaderRight() {
 
 function App(): React.JSX.Element {
   const Stack = createNativeStackNavigator();
-  
-  const user = FIREBASE_AUTH?.currentUser;
 
-  console.log({user})
+  const [loading, setLoading] = useState<boolean>(true);
+  const [initialRouteName, setInitialRouteName] = useState<string>("Walkthrough");
+
+  FIREBASE_AUTH?.currentUser;
+
+  useEffect(() => {
+    const auth = getAuth();
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      console.log("user check: ", user)
+      if (user) {
+        setInitialRouteName('Main');
+      } else {
+        setInitialRouteName('Walkthrough');
+      }
+      setLoading(false)
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color={Colors.PrimaryLightColor} />
+        <Text style={styles.text}>Yükleniyor...</Text>
+      </View>
+    );
+  }
 
   return (
     <GestureHandlerRootView style={{flex: 1}}>
       <NavigationContainer>
         <StatusBar translucent barStyle="dark-content" />
-        <Stack.Navigator screenOptions={{ headerBackTitleVisible: true }}>
-          {
-            user ? (
+        <Stack.Navigator initialRouteName={initialRouteName} screenOptions={{ headerBackTitleVisible: true }}>
               <Stack.Screen name='Main' component={MainScreens} options={{ 
-                title: "",
-                headerShown: false
-              }} />
-            )
-            :
-            <>
+                      title: "",
+                      headerShown: false
+                    }} />
               <Stack.Screen name="Walkthrough" component={Walkthrough} options={{ headerShown: false }} />
               <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
-            </>
-          }
         </Stack.Navigator>
       </NavigationContainer>
     </GestureHandlerRootView>
@@ -136,6 +157,15 @@ function App(): React.JSX.Element {
 const styles = StyleSheet.create({
   stack: {
     flex: 1,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    backgroundColor: Colors.PrimaryDarkColor,
+    alignItems: 'center',
+  },
+  text: {
+    color: Colors.TextColor
   }
 });
 
