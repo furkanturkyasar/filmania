@@ -314,7 +314,6 @@ const styles = StyleSheet.create({
         borderTopRightRadius: 50,
     },
     input: {
-        //backgroundColor: "red",
         height: 50,
         borderRadius: 16,
         borderColor: Colors.TextColor,

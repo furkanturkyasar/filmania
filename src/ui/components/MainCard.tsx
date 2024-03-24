@@ -1,20 +1,32 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Image, StyleSheet, Text, View } from 'react-native'
 import StarIcon from 'react-native-vector-icons/Octicons';
 import LinearGradient from 'react-native-linear-gradient';
 import {Colors} from '../../../app.json';
+import { Movie } from '../../types/movie';
 
-const MainCard = () => {
-    const dummyImage = "https://m.media-amazon.com/images/M/MV5BNWIwODRlZTUtY2U3ZS00Yzg1LWJhNzYtMmZiYmEyNmU1NjMzXkEyXkFqcGdeQXVyMTQxNzMzNDI@._V1_QL75_UY562_CR4,0,380,562_.jpg";
+
+interface MainCardProps {
+    upcomingMovies: Movie[] | null;
+}
+
+const MainCard = ({upcomingMovies}: MainCardProps) => {
+
+    console.log("movie: ", upcomingMovies[0])
+    if (!upcomingMovies || upcomingMovies.length < 1) {
+        return
+    }
+
+    const imageUrl = `https://image.tmdb.org/t/p/w500${upcomingMovies[0].poster_path}`
 
   return (
     <View style={styles.container}>
-        <Image style={styles.image} src={dummyImage} />
+        <Image style={styles.image} source={{ uri: imageUrl }} />
             <LinearGradient colors={['rgba(0,0,0,0)', 'rgba(0,0,0,0.7)']} style={styles.gradient}>
-                <Text style={styles.title}>Forrest Gump</Text>
+                <Text style={styles.title}>{upcomingMovies[0].title}</Text>
                 <View style={styles.ratingContainer}>
                     <StarIcon name='star-fill' size={20} color={Colors.StarColor} />
-                    <Text style={styles.ratingText}>9.0/10</Text>
+                    <Text style={styles.ratingText}>{upcomingMovies && upcomingMovies[0].vote_average.toFixed(1)}/10</Text>
                 </View>
             </LinearGradient>
     </View>

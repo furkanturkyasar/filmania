@@ -4,6 +4,8 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import 'react-native-gesture-handler';
 import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { Provider } from 'react-redux';
+import { store } from './src/app/store';
 
 import React, { useEffect, useState } from 'react';
 import {
@@ -53,7 +55,7 @@ const MainScreens = () => {
   return (
        <View style={styles.stack}>
         <Tab.Navigator screenOptions={{
-          tabBarStyle: {backgroundColor: '#1F2C44', borderTopWidth: 0, borderTopColor: Colors.TextColor, borderRadius: 0, paddingTop: 10}, 
+          tabBarStyle: { backgroundColor: '#1F2C44', borderTopWidth: 0, borderTopColor: Colors.TextColor, borderRadius: 0, paddingTop: 10 }, 
           headerTitleAlign: 'center',
           headerRight: HeaderRight,
           headerStyle: { backgroundColor: Colors.PrimaryDarkColor},
@@ -105,14 +107,16 @@ function HeaderRight() {
 }
 
 function App(): React.JSX.Element {
+  
+  FIREBASE_AUTH?.currentUser;
+  
   const Stack = createNativeStackNavigator();
 
   const [loading, setLoading] = useState<boolean>(true);
   const [initialRouteName, setInitialRouteName] = useState<string>("Walkthrough");
 
-  FIREBASE_AUTH?.currentUser;
-
   useEffect(() => {
+
     const auth = getAuth();
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       console.log("user check: ", user)
@@ -136,21 +140,24 @@ function App(): React.JSX.Element {
       </View>
     );
   }
-
+   
   return (
-    <GestureHandlerRootView style={{flex: 1}}>
-      <NavigationContainer>
-        <StatusBar translucent barStyle="dark-content" />
-        <Stack.Navigator initialRouteName={initialRouteName} screenOptions={{ headerBackTitleVisible: true }}>
-              <Stack.Screen name='Main' component={MainScreens} options={{ 
-                      title: "",
-                      headerShown: false
-                    }} />
-              <Stack.Screen name="Walkthrough" component={Walkthrough} options={{ headerShown: false }} />
-              <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
-        </Stack.Navigator>
-      </NavigationContainer>
-    </GestureHandlerRootView>
+    <Provider store={store}>
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <NavigationContainer>
+          <StatusBar translucent barStyle="dark-content" />
+          <Stack.Navigator initialRouteName={initialRouteName} screenOptions={{ headerBackTitleVisible: true }}>
+                <Stack.Screen name='Main' component={MainScreens} options={{ 
+                        title: "",
+                        headerShown: false
+                      }} 
+                />
+                <Stack.Screen name="Walkthrough" component={Walkthrough} options={{ headerShown: false }} />
+                <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
+          </Stack.Navigator>
+        </NavigationContainer>
+      </GestureHandlerRootView>
+    </Provider>
   );
 }
 
