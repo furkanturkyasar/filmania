@@ -3,6 +3,8 @@ import TabMenu from "../ui/components/TabMenu";
 import { Colors } from '../../app.json';
 import React, { useState } from 'react';
 import ExploreCarousel from "../ui/components/ExploreCarousel";
+import { useDispatch } from 'react-redux';
+
 
 const { width, height } = Dimensions.get('screen')
 

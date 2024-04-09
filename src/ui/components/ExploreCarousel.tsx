@@ -14,6 +14,7 @@ const ExploreCarousel = () => {
 
     const [isFast, setIsFast] = useState(true);
     const [play, setPlay] = useState(false);
+    const [selectedCard, setSelectedCard] = useState(null);
 
     
     const ITEM_WIDTH = 130;

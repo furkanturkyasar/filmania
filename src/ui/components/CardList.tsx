@@ -1,86 +1,72 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Text, View, StyleSheet, FlatList, SafeAreaView, Image } from 'react-native';
 import { Colors } from '../../../app.json';
 import StarIcon from 'react-native-vector-icons/Octicons';
+import { Media } from '../../types/movie';
+import { useDispatch } from 'react-redux';
+import { fetchNowPlayingMoviesAction } from '../../features/movies/moviesActions';
+import { fetchNowPlayingTvAction } from '../../features/tv/tvActions';
 
 
-type CardListProps = {
+
+export type CardListProps = {
     hasTopTen?: boolean;
     title: string;
+    activeIndex: number;
+    trendingMovies?: Media[] | null | undefined;
+    nowPlayingMovies?: Media[] | null | undefined;
+    trendingTv?: Media[] | null | undefined;
+    nowPlayingTv?: Media[] | null | undefined;
 }
 
+export type RenderItemProps = {
+    item: Media;
+    index: number | string;
+}
+
+const CardList = ({hasTopTen = false, title, trendingMovies, nowPlayingMovies, trendingTv, nowPlayingTv, activeIndex}: CardListProps) => {
+    const dispatch = useDispatch();
+
+    const [pageNumber, setPageNumber] = React.useState<number>(1);
+
+    const handleEndReached = () => {
+        if (activeIndex === 0) {
+            dispatch(fetchNowPlayingMoviesAction({pageNumber: pageNumber + 1}))
+        } else {
+            dispatch(fetchNowPlayingTvAction({pageNumber: pageNumber + 1}))
+        }
+        setPageNumber(prevPageNumber => prevPageNumber + 1);
+    };
 
 
-const CardList = ({hasTopTen = false, title}: CardListProps) => {
+    function RenderItem({item, index}: RenderItemProps) {
+            const imageUrl = `https://image.tmdb.org/t/p/w200${item.poster_path}`;
 
-    const DATA = [
-        {
-          rank: 1,
-          id: 'bd7acbea-c1b1-46c2-aed5-3ad53abb28ba',
-          title: 'First Item',
-          image: "https://m.media-amazon.com/images/M/MV5BMDFkYTc0MGEtZmNhMC00ZDIzLWFmNTEtODM1ZmRlYWMwMWFmXkEyXkFqcGdeQXVyMTMxODk2OTU@._V1_QL75_UX380_CR0,1,380,562_.jpg"
-        },
-        {
-          id: '3ac68afc-c605-48d3-a4f8-fbd91aa97f63',
-          rank: 2,
-          title: 'Second Item',
-          image: "https://m.media-amazon.com/images/M/MV5BMTMxNTMwODM0NF5BMl5BanBnXkFtZTcwODAyMTk2Mw@@._V1_QL75_UX380_CR0,0,380,562_.jpg"
-        },
-        {
-          id: '58694a0f-3da1-471f-bd96-145571e29d72',
-          rank: 3,
-          title: 'Third Item',
-          image: "https://m.media-amazon.com/images/M/MV5BMWMwMGQzZTItY2JlNC00OWZiLWIyMDctNDk2ZDQ2YjRjMWQ0XkEyXkFqcGdeQXVyNzkwMjQ5NzM@._V1_QL75_UY562_CR7,0,380,562_.jpg"
-        },
-        {
-            id: '58694a0f-3da1-471f-bd96-145571e29d724444444',
-            rank: 4,
-            title: 'Third Item',
-            image: "https://m.media-amazon.com/images/M/MV5BMWU4N2FjNzYtNTVkNC00NzQ0LTg0MjAtYTJlMjFhNGUxZDFmXkEyXkFqcGdeQXVyNjc1NTYyMjg@._V1_QL75_UX380_CR0,11,380,562_.jpg"
-        },
-        {
-            id: '58694a0f-3da1-471f-bd96-145571e29d72555555',
-            title: 'Third Item',
-            rank: 5,
-            image: "https://m.media-amazon.com/images/M/MV5BNDE4OTMxMTctNmRhYy00NWE2LTg3YzItYTk3M2UwOTU5Njg4XkEyXkFqcGdeQXVyNjU0OTQ0OTY@._V1_QL75_UX380_CR0,4,380,562_.jpg"
-        },
-        {
-            id: '58694a0f-3da1-471f-bd96-145571e29d72666666',
-            title: 'Third Item',
-            rank: 6,
-            image: "https://m.media-amazon.com/images/M/MV5BNzA5ZDNlZWMtM2NhNS00NDJjLTk4NDItYTRmY2EwMWZlMTY3XkEyXkFqcGdeQXVyNzkwMjQ5NzM@._V1_QL75_UX380_CR0,0,380,562_.jpg"
-        },
-
-      ];
-      
-
-    function RenderItem({item}: any) {
-        return (
-            <View style={{ width: 150, flexDirection: hasTopTen ? 'row' : 'column' }}>
-                {hasTopTen ? <Text style={{color: Colors.TextColor, fontSize: 140, fontWeight: '700', zIndex: 0, position: 'absolute', left: -11, bottom: -35 }}>{item.rank}</Text> : null}
-                <Image  style={{width: hasTopTen ? 100 : 120, height: hasTopTen ? '100%' : 180, zIndex: 1, marginLeft: hasTopTen ? 40 : 0, borderRadius: 6 }} src={item.image} />
-                {
-                    !hasTopTen &&
-                    <View style={{ position: 'absolute', bottom: 0, width: '100%', height: 40 }}>
-                        <Text style={{fontSize: 14, color: Colors.TextColor}}>{item.title}</Text>
-                        <View style={{flexDirection: 'row', gap: 2, alignItems: 'center', marginTop: 1 }}> 
-                            <StarIcon name='star-fill' size={11} color={Colors.StarColor} />
-                            <Text style={{color: Colors.TextColor, fontSize: 11}}>9.0/10</Text>
+            return (
+                <View style={{ width: 150, flexDirection: hasTopTen ? 'row' : 'column'}}>
+                    {hasTopTen ? <Text style={{color: Colors.TextColor, fontSize: 140, fontWeight: '700', zIndex: 2, position: 'absolute', left: -21, bottom: -35 }}>{+index + 1}</Text> : null}
+                    <Image  style={{width: hasTopTen ? 100 : 120, height: hasTopTen ? '100%' : 180, zIndex: 1, marginLeft: hasTopTen ? 40 : 0, borderRadius: 6 }} src={imageUrl} />
+                    {
+                        !hasTopTen &&
+                        <View style={{ position: 'absolute', bottom: 20, width: 120, height: 55, alignContent: "center", justifyContent: 'center' }}>
+                            <Text numberOfLines={1} style={{fontSize: 14, color: Colors.TextColor}}>{activeIndex === 0 ? item.title : (item as any).name}</Text>
+                            <View style={{flexDirection: 'row', gap: 2, alignItems: 'center', marginTop: 1 }}> 
+                                <StarIcon name='star-fill' size={11} color={Colors.StarColor} />
+                                <Text style={{color: Colors.TextColor, fontSize: 11}}>9.0/10</Text>
+                            </View>
                         </View>
-                    </View>
-                }
-            </View>
-        );
+                    }
+                </View>
+            );
     }
 
     const myItemSeparator = () => {
-
         return (
           <View
            style={{ height: 1, marginHorizontal: hasTopTen ? 10 : -10 }}
           />
         );
-      };
+    };
 
     if (hasTopTen) {
         return (
@@ -95,29 +81,31 @@ const CardList = ({hasTopTen = false, title}: CardListProps) => {
                     scrollEnabled
                     pagingEnabled
                     ItemSeparatorComponent={myItemSeparator}
-                    data={DATA} 
-                    renderItem={({item}) => <RenderItem item={item} />}
-                    keyExtractor={(item) => item.id}
+                    data={activeIndex === 0 ? trendingMovies ?? [] : trendingTv ?? []} 
+                    renderItem={({item, index}) => <RenderItem item={item} index={index} />}
+                    keyExtractor={(item, index) => `tr_${item.id.toString()}_${index}`}
                     />
                 </SafeAreaView>
             </View>
         );
     } else {
+
         return (
             <View style={styles.container}>
                 <View style={{flexDirection: 'row', gap: 5}}>
                     <View style={{width: 3, backgroundColor: Colors.PrimaryLightColor, height: 20, borderRadius: 12}} />
                     <Text style={{color : Colors.TextColor, fontWeight: '700', fontSize: 17, marginBottom: 10}}>{title}</Text>
                 </View>
-                <SafeAreaView style={{flex: 1, height: 225 }}>
+                <SafeAreaView style={{flex: 1, height: 260 }}>
                     <FlatList
                     horizontal={true}
                     scrollEnabled
                     pagingEnabled
+                    onEndReached={() => handleEndReached()}
                     ItemSeparatorComponent={myItemSeparator}
-                    data={DATA} 
-                    renderItem={({item}) => <RenderItem item={item} />}
-                    keyExtractor={(item) => item.id}
+                    data={activeIndex === 0 ? nowPlayingMovies ?? [] : nowPlayingTv ?? []} 
+                    renderItem={({item, index}) => <RenderItem item={item} index={`${activeIndex === 0 ? "movie_" : "tv_"}nw_${index}`} />}
+                    keyExtractor={(item, index) => `nw_${item.id.toString()}_${index}`}
                     />
                 </SafeAreaView>
             </View>
@@ -131,6 +119,6 @@ export default CardList;
 
 const styles = StyleSheet.create({
     container: {
-        marginTop: 20
+        marginTop: 20,
     }
 });
