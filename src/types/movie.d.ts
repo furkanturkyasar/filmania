@@ -34,3 +34,7 @@ export interface TvState {
     nowPlayingTv: Media[] | null;
     discoverTv: Media[] | null;
 }
+
+export interface SharedState {
+    activeIndex: number;
+}

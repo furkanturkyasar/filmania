@@ -1,22 +1,29 @@
 import { SafeAreaView, ScrollView, Text, View, StyleSheet, Dimensions } from "react-native";
 import TabMenu from "../ui/components/TabMenu";
 import { Colors } from '../../app.json';
-import React, { useState } from 'react';
-import ExploreCarousel from "../ui/components/ExploreCarousel";
+import React, { useState, useEffect } from 'react';
+import ExploreCarouselContainer from "../ui/containers/ExploreCarousel";
 import { useDispatch } from 'react-redux';
-
+import { fetchDiscoverMoviesAction } from '../features/movies/moviesActions';
+import { fetchDiscoverTvAction } from '../features/tv/tvActions';
 
 const { width, height } = Dimensions.get('screen')
 
 export default function ExploreScreen() {
     const [active, setActive] = useState(0);
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+        dispatch(fetchDiscoverMoviesAction());
+        dispatch(fetchDiscoverTvAction({ type: "tv" }));
+    },[dispatch])
 
     return (
         <SafeAreaView style={styles.container}>
             <View style={styles.wrapper}>
                 <View style={{ height: height }}>
-                    <TabMenu active={active} setActive={setActive}  />
-                    <ExploreCarousel />
+                    <TabMenu />
+                    <ExploreCarouselContainer />
                 </View>
             </View>
         </SafeAreaView>

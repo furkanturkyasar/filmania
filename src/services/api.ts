@@ -64,7 +64,7 @@ export const fetchNowPlayingMedias = (param?: MediaParam) => {
 export const fetchDiscoverMedias = (type: string | null = "movie") => {
  
   const url: string = `${Config.BASE_API_URL}/discover/${type}/?language=tr-TR`;
-  
+
   return ajax({
     url: url,
     method: 'GET',

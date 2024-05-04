@@ -9,14 +9,19 @@ import ExploreIcon from 'react-native-vector-icons/Ionicons';
 import Icon from 'react-native-vector-icons/Ionicons';
 import SavedIcon from 'react-native-vector-icons/Octicons';
 
-const ExploreCarousel = () => {
+export interface ExploreCarouselProps {
+  activeIndex: number;
+}
+
+const ExploreCarousel = ({activeIndex}: ExploreCarouselProps) => {
     const { width, height } = Dimensions.get('window');
 
     const [isFast, setIsFast] = useState(true);
     const [play, setPlay] = useState(false);
     const [selectedCard, setSelectedCard] = useState(null);
 
-    
+    console.log("active index: ", activeIndex)
+
     const ITEM_WIDTH = 130;
     const ITEM_HEIGHT = 180;
 

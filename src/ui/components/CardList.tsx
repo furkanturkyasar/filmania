@@ -27,15 +27,18 @@ export type RenderItemProps = {
 const CardList = ({hasTopTen = false, title, trendingMovies, nowPlayingMovies, trendingTv, nowPlayingTv, activeIndex}: CardListProps) => {
     const dispatch = useDispatch();
 
-    const [pageNumber, setPageNumber] = React.useState<number>(1);
-
+    const [moviePageNumber, setMoviePageNumber] = React.useState<number>(1);
+    const [tvPageNumber, setTvPageNumber] = React.useState<number>(1);
+    
     const handleEndReached = () => {
+        
         if (activeIndex === 0) {
-            dispatch(fetchNowPlayingMoviesAction({pageNumber: pageNumber + 1}))
+            dispatch(fetchNowPlayingMoviesAction({pageNumber: moviePageNumber + 1}))
+            setMoviePageNumber(prevPageNumber => prevPageNumber + 1);
         } else {
-            dispatch(fetchNowPlayingTvAction({pageNumber: pageNumber + 1}))
+            dispatch(fetchNowPlayingTvAction({pageNumber: tvPageNumber + 1}))
+            setTvPageNumber(prevPageNumber => prevPageNumber + 1);
         }
-        setPageNumber(prevPageNumber => prevPageNumber + 1);
     };
 
 
@@ -89,7 +92,6 @@ const CardList = ({hasTopTen = false, title, trendingMovies, nowPlayingMovies, t
             </View>
         );
     } else {
-
         return (
             <View style={styles.container}>
                 <View style={{flexDirection: 'row', gap: 5}}>

@@ -1,20 +1,24 @@
 import { Text, View, StyleSheet, TouchableOpacity } from 'react-native'
 import { Colors } from '../../../app.json';
+import { useSelector, useDispatch } from 'react-redux';
+import { SetActiveIndexAction } from '../../features/shared/sharedActions';
 
 type TabMenuProps = {
     active: number;
     setActive: React.Dispatch<React.SetStateAction<number>>;
 }
 
-const TabMenu = ({active, setActive}: TabMenuProps ): React.ReactElement => {
-    
+const TabMenu = (): React.ReactElement => {
+    const activeIndex = useSelector((state: RootState) => state.shared.activeIndex);
+
+    const dispatch = useDispatch()
 
   return (
     <View style={styles.container}>
-        <TouchableOpacity onPress={() => setActive(0)} style={[styles.button, active === 0 ? { borderBottomColor: Colors.PrimaryLightColor, borderBottomWidth: 3} : null ]}>
+        <TouchableOpacity onPress={() => dispatch(SetActiveIndexAction(0))} style={[styles.button, activeIndex === 0 ? { borderBottomColor: Colors.PrimaryLightColor, borderBottomWidth: 3} : null ]}>
             <Text style={styles.buttonText}>Film</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => setActive(1)} style={[styles.button, active === 1 ? { borderBottomColor: Colors.PrimaryLightColor, borderBottomWidth: 3} : null ]}>
+        <TouchableOpacity onPress={() => dispatch(SetActiveIndexAction(1))} style={[styles.button, activeIndex === 1 ? { borderBottomColor: Colors.PrimaryLightColor, borderBottomWidth: 3} : null ]}>
             <Text style={styles.buttonText}>Dizi</Text>
         </TouchableOpacity>
     </View>
