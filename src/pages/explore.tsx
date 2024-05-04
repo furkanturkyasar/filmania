@@ -10,7 +10,6 @@ import { fetchDiscoverTvAction } from '../features/tv/tvActions';
 const { width, height } = Dimensions.get('screen')
 
 export default function ExploreScreen() {
-    const [active, setActive] = useState(0);
     const dispatch = useDispatch();
 
     useEffect(() => {

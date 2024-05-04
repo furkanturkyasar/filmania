@@ -61,10 +61,16 @@ export const fetchNowPlayingMedias = (param?: MediaParam) => {
   });
 };
 
-export const fetchDiscoverMedias = (type: string | null = "movie") => {
- 
-  const url: string = `${Config.BASE_API_URL}/discover/${type}/?language=tr-TR`;
+export const fetchDiscoverMedias = (param?: MediaParam) => {
+  let query: string = "movie"
+  if (param) {
+    if (param.type && param.type === "tv") {
+      query = "tv"
+    }
+  }
 
+  const url: string = `${Config.BASE_API_URL}/discover/${query}?language=tr-TR`;
+  
   return ajax({
     url: url,
     method: 'GET',

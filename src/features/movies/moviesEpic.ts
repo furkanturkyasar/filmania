@@ -52,13 +52,16 @@ export const discoverMoviesEpic = (action$: any) => {
   return (
     action$.pipe(
       ofType('movies/fetchDiscoverMovies'),
-      mergeMap((action: any) =>
-        fetchDiscoverMedias(action.payload).pipe(
-          map((ajaxResponse: any) => 
-          getDiscoverMovies(ajaxResponse.response.results)
+      mergeMap((action: any) =>{
+        return fetchDiscoverMedias(action.payload).pipe(
+          map((ajaxResponse: any) => {
+            return getDiscoverMovies(ajaxResponse.response.results)
+          } 
           ),
           catchError((error: any) => of({ type: 'movies/fetchFailed', error: error.message }))
         )
+      }
+        
       )
   )
   )

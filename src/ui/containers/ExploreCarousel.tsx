@@ -7,8 +7,14 @@ const ExploreCarouselContainer = () => {
   const dispatch = useDispatch();
 
   const activeIndex = useSelector((state: RootState) => state.shared.activeIndex); 
+  const discoverMovies = useSelector((state: RootState) => state.movies.discoverMovies);
+  const discoverTv = useSelector((state: RootState) => state.tv.discoverTv);
 
-  return <ExploreCarousel activeIndex={activeIndex}   />;
+  let discoverMedia  = discoverMovies;
+  if (activeIndex !== 0)
+    discoverMedia = discoverTv
+
+  return <ExploreCarousel activeIndex={activeIndex} discoverMedia={discoverMedia}   />;
 };
 
 export default ExploreCarouselContainer;
