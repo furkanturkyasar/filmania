@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Text, View, StyleSheet, FlatList, SafeAreaView, Image } from 'react-native';
+import { Text, View, StyleSheet, FlatList, SafeAreaView, Image, TouchableOpacity } from 'react-native';
 import { Colors } from '../../../app.json';
 import StarIcon from 'react-native-vector-icons/Octicons';
 import { Media } from '../../types/movie';
@@ -17,14 +17,16 @@ export type CardListProps = {
     nowPlayingMovies?: Media[] | null | undefined;
     trendingTv?: Media[] | null | undefined;
     nowPlayingTv?: Media[] | null | undefined;
+    navigation?: any;
 }
 
 export type RenderItemProps = {
     item: Media;
     index: number | string;
+    navigation?: any;
 }
 
-const CardList = ({hasTopTen = false, title, trendingMovies, nowPlayingMovies, trendingTv, nowPlayingTv, activeIndex}: CardListProps) => {
+const CardList = ({hasTopTen = false, title, trendingMovies, nowPlayingMovies, trendingTv, nowPlayingTv, activeIndex, navigation}: CardListProps) => {
     const dispatch = useDispatch();
 
     const [moviePageNumber, setMoviePageNumber] = React.useState<number>(1);
@@ -42,11 +44,15 @@ const CardList = ({hasTopTen = false, title, trendingMovies, nowPlayingMovies, t
     };
 
 
-    function RenderItem({item, index}: RenderItemProps) {
+    function RenderItem({item, index, navigation}: RenderItemProps) {
             const imageUrl = `https://image.tmdb.org/t/p/w200${item.poster_path}`;
 
             return (
-                <View style={{ width: 150, flexDirection: hasTopTen ? 'row' : 'column'}}>
+                <TouchableOpacity onPress={() => {
+                    navigation.navigate("MediaDetail", {
+                        id: item.id
+                    })
+                }} style={{ width: 150, flexDirection: hasTopTen ? 'row' : 'column'}}>
                     {hasTopTen ? <Text style={{color: Colors.TextColor, fontSize: 140, fontWeight: '700', zIndex: 2, position: 'absolute', left: -21, bottom: -35 }}>{+index + 1}</Text> : null}
                     <Image  style={{width: hasTopTen ? 100 : 120, height: hasTopTen ? '100%' : 180, zIndex: 1, marginLeft: hasTopTen ? 40 : 0, borderRadius: 6 }} src={imageUrl} />
                     {
@@ -59,7 +65,7 @@ const CardList = ({hasTopTen = false, title, trendingMovies, nowPlayingMovies, t
                             </View>
                         </View>
                     }
-                </View>
+                </TouchableOpacity>
             );
     }
 
@@ -85,7 +91,7 @@ const CardList = ({hasTopTen = false, title, trendingMovies, nowPlayingMovies, t
                     pagingEnabled
                     ItemSeparatorComponent={myItemSeparator}
                     data={activeIndex === 0 ? trendingMovies ?? [] : trendingTv ?? []} 
-                    renderItem={({item, index}) => <RenderItem item={item} index={index} />}
+                    renderItem={({item, index}) => <RenderItem item={item} index={index} navigation={navigation} />}
                     keyExtractor={(item, index) => `tr_${item.id.toString()}_${index}`}
                     />
                 </SafeAreaView>
@@ -106,7 +112,7 @@ const CardList = ({hasTopTen = false, title, trendingMovies, nowPlayingMovies, t
                     onEndReached={() => handleEndReached()}
                     ItemSeparatorComponent={myItemSeparator}
                     data={activeIndex === 0 ? nowPlayingMovies ?? [] : nowPlayingTv ?? []} 
-                    renderItem={({item, index}) => <RenderItem item={item} index={`${activeIndex === 0 ? "movie_" : "tv_"}nw_${index}`} />}
+                    renderItem={({item, index}) => <RenderItem item={item} index={`${activeIndex === 0 ? "movie_" : "tv_"}nw_${index}`} navigation={navigation} />}
                     keyExtractor={(item, index) => `nw_${item.id.toString()}_${index}`}
                     />
                 </SafeAreaView>

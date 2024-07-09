@@ -209,8 +209,7 @@ const styles = StyleSheet.create({
         marginTop: 30,
         textAlign: 'center',
         fontSize: 18,
-        width: 280,
-        lineHeight: 26
+        lineHeight: 26,
     },
     image: {
         width: width * 0.60,
@@ -226,7 +225,6 @@ const styles = StyleSheet.create({
         alignSelf: "center",
         justifyContent: "center",
         alignItems: "center",
-        // marginTop: 32,
         marginHorizontal: 24,
         borderBottomColor: Colors.PrimaryLightColor,
         borderBottomWidth: 2,
@@ -234,7 +232,8 @@ const styles = StyleSheet.create({
     buttonText: {
         fontWeight: "700",
         fontSize: 20,
-        color: Colors.TextColor
+        color: Colors.TextColor,
+        textAlign: 'center',
     },
     skipButton: {
         position: 'absolute',

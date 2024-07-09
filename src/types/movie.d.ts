@@ -2,14 +2,15 @@ export interface Media {
     adult: boolean;
     backdrop_path: string;
     genre_ids: number[];
-    id: number;
+    id: string;
     original_language: string;
     original_title: string;
     overview: string;
     popularity: number;
     poster_path: string;
     release_date: string;
-    title: string;
+    title?: string;
+    name?: string;
     video: boolean;
     vote_average: number;
     vote_count: number;
@@ -21,11 +22,18 @@ export interface MediaParam {
     type?: string;
 }
 
+export interface MovieList {
+    movies?: string[];
+}
+
 export interface MovieState {
     upcomingMovies: Media[] | null;
     trendingMovies: Media[] | null;
     nowPlayingMovies: Media[] | null;
     discoverMovies: Media[] | null;
+    movieLists: MovieList[];
+    status: 'idle' | 'loading' | 'succeeded' | 'failed';
+    error: string | null;
 }
 
 export interface TvState {
@@ -37,4 +45,7 @@ export interface TvState {
 
 export interface SharedState {
     activeIndex: number;
+    bookmarkList: Media[] | [];
+    multiMedias: Media[] | [];
+    pagedInfo: {};
 }

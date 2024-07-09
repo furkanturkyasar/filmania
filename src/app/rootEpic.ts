@@ -1,6 +1,8 @@
 import { combineEpics } from 'redux-observable';
-import { upcomingMoviesEpic, trendingMoviesEpic, nowPlayingMoviesEpic, discoverMoviesEpic } from '../features/movies/moviesEpic';
+import { upcomingMoviesEpic, trendingMoviesEpic, nowPlayingMoviesEpic, discoverMoviesEpic, addMovieToListEpic, fetchMovieListsEpic } from '../features/movies/moviesEpic';
 import { upcomingTvEpic, trendingTvEpic, nowPlayingTvEpic, discoverTvEpic} from '../features/tv/tvEpic';
+import { saveListEpic } from '../features/list/listEpic';
+import { fetchMultiMediasEpic } from '../features/shared/sharedEpic';
 
 export const rootEpic = combineEpics(
     upcomingMoviesEpic,
@@ -10,5 +12,9 @@ export const rootEpic = combineEpics(
     upcomingTvEpic,
     trendingTvEpic,
     nowPlayingTvEpic,
-    discoverTvEpic
+    discoverTvEpic,
+    saveListEpic,
+    addMovieToListEpic,
+    fetchMovieListsEpic,
+    fetchMultiMediasEpic
 );

@@ -15,6 +15,8 @@ const { width, height } = Dimensions.get('screen');
 export default function LoginScreen({route, navigation}: any) {
 
     const [showLogin, setShowLogin] = useState<Boolean | null>(null);
+    const [errorCode, setErrorCode] = useState<string | null>(null);
+
     const auth = getAuth();
 
     const validationSchema = Yup.object().shape({
@@ -34,6 +36,18 @@ export default function LoginScreen({route, navigation}: any) {
     useEffect(() => {
         setShowLogin(route?.params?.isLogin)
     }, [])
+
+    useEffect(() => {
+        const timeOut = setTimeout(() => {
+            setErrorCode(null)
+        }, 2000)
+
+
+        return () => {
+            clearTimeout(timeOut)
+        }
+
+    }, [errorCode])
 
     const formik = useFormik({
         initialValues: { fullName: '', email: '', password: '', passwordCheck: '' },
@@ -58,7 +72,7 @@ export default function LoginScreen({route, navigation}: any) {
                 .catch((error) => {
                     const errorCode = error.code;
                     const errorMessage = error.message;
-
+                    setErrorCode(errorMessage);
                     console.log({errorCode, errorMessage})
                 });
         },
@@ -88,7 +102,7 @@ export default function LoginScreen({route, navigation}: any) {
                 .catch((error) => {
                     const errorCode = error.code;
                     const errorMessage = error.message;
-
+                    setErrorCode(errorMessage);
                     console.log({errorCode, errorMessage})
             });
         },
@@ -202,6 +216,10 @@ export default function LoginScreen({route, navigation}: any) {
                         </TouchableOpacity>
                     </View>
                     <View style={{ alignItems: "center" }}>
+                        {
+                            errorCode &&
+                            <Text style={styles.errorText}>{errorCode}</Text>
+                        }
                         <TouchableOpacity style={styles.buttonContainer} onPress={() => formik.handleSubmit()}>
                             <Text style={{color: Colors.TextColor, textAlign: 'center', fontWeight: "700" }}>KAYDOL</Text>
                         </TouchableOpacity>
@@ -261,6 +279,10 @@ export default function LoginScreen({route, navigation}: any) {
                     </TouchableOpacity>
                 </View>
                 <View style={{ alignItems: "center" }}>
+                    {
+                        errorCode &&
+                        <Text style={styles.errorText}>{errorCode}</Text>
+                    }
                     <TouchableOpacity style={[styles.buttonContainer, { bottom: -30}]} onPress={() => formikLogin.handleSubmit()}>
                         <Text style={{color: Colors.TextColor, textAlign: 'center', borderBottomWidth: 1 , borderBottomColor: "red", fontWeight: "700" }}>GİRİŞ YAP</Text>
                     </TouchableOpacity>
@@ -302,6 +324,10 @@ const styles = StyleSheet.create({
     },
     wrapper: {
 
+    },
+    errorText: {
+        color: 'red',
+        marginTop: 30,
     },
     header: {
         height: "25%",

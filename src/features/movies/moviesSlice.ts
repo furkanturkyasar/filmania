@@ -1,12 +1,15 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { Media, MovieState } from '../../types/movie';
+import { Media, MovieList, MovieState } from '../../types/movie';
 
 
 const initialState: MovieState = {
   upcomingMovies: [],
   trendingMovies: [],
   nowPlayingMovies: [],
-  discoverMovies: []
+  discoverMovies: [],
+  movieLists: [],
+  status: 'idle',
+  error: null,
 };
 
 export const movieSlice = createSlice({
@@ -32,10 +35,37 @@ export const movieSlice = createSlice({
       } else {
         state.discoverMovies = action.payload
       }
-    }
+    },
+    fetchMovieListsStart: (state) => {
+      state.status = 'loading';
+    },
+    fetchMovieListsSuccess: (state, action: PayloadAction<MovieList[]>) => {
+      state.status = 'succeeded';
+      state.movieLists = action.payload;
+    },
+    fetchMovieListsFailure: (state, action: PayloadAction<string>) => {
+      console.log("failure: ", action.payload)
+      state.status = 'failed';
+      state.error = action.payload;
+    },
+    addMovieToListRequest: (state) => {
+      state.status = 'loading';
+    },
+    addMovieToListSuccess: (state, action: PayloadAction<{ listId: string, movie: Media }>) => {
+      const { listId, movie } = action.payload;
+      // const existingList = state.movieLists.find((list) => list.id === listId);
+      // if (existingList) {
+      //   existingList.movies.push(movie.id);
+      // }
+      state.status = 'succeeded';
+    },
+    addMovieToListFailure: (state, action: PayloadAction<string>) => {
+      state.status = 'failed';
+      state.error = action.payload;
+    },
   },
 });
 
-export const { getUpcomingMovies, getTrendingMovies, getNowPlayingMovies, getDiscoverMovies } = movieSlice.actions;
+export const { getUpcomingMovies, getTrendingMovies, getNowPlayingMovies, getDiscoverMovies, fetchMovieListsStart, fetchMovieListsSuccess, fetchMovieListsFailure, addMovieToListSuccess, addMovieToListRequest, addMovieToListFailure } = movieSlice.actions;
 
 export default movieSlice.reducer;

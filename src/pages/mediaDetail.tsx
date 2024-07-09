@@ -1,26 +1,28 @@
 import { SafeAreaView, ScrollView, Text, View, StyleSheet, Dimensions } from "react-native";
 import { Colors } from '../../app.json';
 import React, { useEffect } from 'react';
+import ListItemContainer from "../ui/containers/ListItem";
 import { useDispatch } from 'react-redux';
-import { fetchCurrentMovieList } from '../features/movies/moviesActions';
 import { getAuth } from "firebase/auth";
-import SearchContainer from "../ui/containers/Search";
 
-const { width, height } = Dimensions.get('screen')
+const { width, height } = Dimensions.get('screen');
 
-export default function SearchScreen({navigation, route}: any) {
+export default function MediaDetailScreen({route, navigation}: any): React.ReactElement {
     const dispatch = useDispatch();
-
+    const { id } = route.params;
+    console.log(route.params);
+    
     useEffect(() => {
         const auth = getAuth();
         const user = auth.currentUser;
+        const userId = user ? user.uid : null;
 
-    },[dispatch])
+    }, [dispatch])
 
     return (
         <SafeAreaView style={styles.container}>
             <View style={styles.wrapper}>
-                <SearchContainer navigation={navigation} />
+                <Text style={styles.textContainer}>{id}</Text>
             </View>
         </SafeAreaView>
     );
@@ -34,5 +36,8 @@ const styles = StyleSheet.create({
     wrapper: {
         margin: 20,
         flex: 1
+    },
+    textContainer: {
+        color: '#FFF'
     }
 });

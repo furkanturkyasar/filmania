@@ -4,18 +4,20 @@ import Carousel, { ICarouselInstance } from 'react-native-reanimated-carousel';
 import { interpolate } from "react-native-reanimated";
 
 import { Colors } from '../../../app.json';
-import MainCard from './MainCard';
-import ExploreIcon from 'react-native-vector-icons/Ionicons';
 import Icon from 'react-native-vector-icons/Ionicons';
-import SavedIcon from 'react-native-vector-icons/Octicons';
-import { Media } from '../../types/movie';
+import SavedIcon from 'react-native-vector-icons/Fontisto';
+
+import { Media, MovieList } from '../../types/movie';
 
 export interface ExploreCarouselProps {
   activeIndex: number;
   discoverMedia?: Media[] | null;
+  currentMoviesList?: MovieList[];
+  onAddMedia?: (movieId: string) => void;
+  navigation?: any;
 }
 
-const ExploreCarousel = ({activeIndex, discoverMedia}: ExploreCarouselProps) => {
+const ExploreCarousel = ({ activeIndex, discoverMedia, onAddMedia, currentMoviesList, navigation }: ExploreCarouselProps) => {
     const { width, height } = Dimensions.get('window');
 
     const [isFast, setIsFast] = useState<boolean>(true);
@@ -89,7 +91,7 @@ const ExploreCarousel = ({activeIndex, discoverMedia}: ExploreCarouselProps) => 
         renderItem={({ index, item }) => {
           const imageUrl = `https://image.tmdb.org/t/p/w300${item.poster_path}`;
           return (
-            <View key={index} style={{ flex: 1 }}>
+            <TouchableOpacity onPress={() => setSelectedCard(discoverMedia[(carouselRef.current as any)?.getCurrentIndex()])}  key={index} style={{ flex: 1 }}>
               <View
                 style={{
                   flex: 1,
@@ -107,7 +109,7 @@ const ExploreCarousel = ({activeIndex, discoverMedia}: ExploreCarouselProps) => 
                     }}
                   />
               </View>
-            </View>
+            </TouchableOpacity>
           );
         }}
         customAnimation={animationStyle}
@@ -129,7 +131,11 @@ const ExploreCarousel = ({activeIndex, discoverMedia}: ExploreCarouselProps) => 
       </TouchableOpacity>
     </View>
     <View style={{height: '20%'}}>
-        <SelectedCard activeMedia={selectedCard} />
+        <SelectedCard onPressAddMedia={(activeMedia) => {
+          if (onAddMedia) {
+            onAddMedia(activeMedia.id)
+          }
+        }} activeMedia={selectedCard} activeIndex={activeIndex} moviesList={currentMoviesList ? currentMoviesList : []} navigation={navigation} />
     </View>
     </>
   )
@@ -140,22 +146,36 @@ export default ExploreCarousel;
 
 interface SelectedCardProps {
   activeMedia: Media | null;
+  moviesList: MovieList[];
+  activeIndex: number;
+  onPressAddMedia: (media: Media) => void;
+  navigation?: any;
 }
 
-const SelectedCard = ({activeMedia}: SelectedCardProps) => {
-  console.log({activeMedia})
+const SelectedCard = ({ activeMedia, onPressAddMedia, moviesList, activeIndex, navigation }: SelectedCardProps) => {
 
-  if (!activeMedia)
-    return null
+  if (!activeMedia) return null
     
   const imageUrl = `https://image.tmdb.org/t/p/w300${activeMedia.poster_path}`;
 
+    let name = "bookmark";
+    if (moviesList.length > 0 && moviesList[0].movies?.includes(activeMedia.id)) {
+      name = "bookmark-alt"
+    }
+
     return (
-        <View key={`act_md_${activeMedia.id}`} style={{flexDirection: 'row', height: 180, gap: 10, justifyContent: 'center', alignItems: 'center'}}>
+        <TouchableOpacity onPress={() => {
+          navigation.navigate("MediaDetail", {
+            id: activeMedia.id
+        })
+        }} key={`act_md_${activeMedia.id}`} style={{flexDirection: 'row', height: 180, gap: 10, justifyContent: 'center', alignItems: 'center'}}>
             <Image style={{width: 130, height: '100%', borderRadius: 12}} source={{uri: imageUrl}} />
-            <SavedIcon name='bookmark' style={{position: 'absolute', right: 0, top: 0 }} size={24} color={Colors.TextColor} />
+            {
+              activeIndex === 0 &&
+              <SavedIcon onPress={() => onPressAddMedia(activeMedia)} name={name} style={{position: 'absolute', right: 0, top: 0 }} size={24} color={Colors.TextColor} />
+            }
             <View style={{justifyContent: 'flex-end', gap: 6, height: 160}}>
-              <Text numberOfLines={1} ellipsizeMode='tail' style={{ color: Colors.TextColor, marginBottom: 10, fontSize: 16, fontWeight: '700', maxWidth: 220}}>{activeMedia.title}</Text>
+              <Text numberOfLines={1} ellipsizeMode='tail' style={{ color: Colors.TextColor, marginBottom: 10, fontSize: 16, fontWeight: '700', maxWidth: 220}}>{activeIndex === 0 ? activeMedia.title :  (activeMedia as any).name}</Text>
               <Text ellipsizeMode='tail' numberOfLines={4} style={{ color: Colors.TextColor, maxWidth: 220, overflow: 'hidden', maxHeight: 100, minHeight: 40, fontSize: 12}}>{activeMedia.overview}</Text>
               <View style={{flexDirection: 'row', justifyContent: 'space-between', marginTop: 10}}>
                 <Text style={{color: Colors.TextColor}}>{activeMedia.release_date}</Text>
@@ -165,6 +185,6 @@ const SelectedCard = ({activeMedia}: SelectedCardProps) => {
                 </View>
               </View>
             </View>
-        </View>
+        </TouchableOpacity>
     );
 }

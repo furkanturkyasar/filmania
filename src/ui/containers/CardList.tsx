@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import CardList, {CardListProps} from '../components/CardList';
 import { RootState } from '../../app/store';
 
-const CardListContainer = ({hasTopTen}: any) => {
+const CardListContainer = ({hasTopTen, navigation}: any) => {
 
   //movies
   const trendingMovies = useSelector((state: RootState) => state.movies.trendingMovies);
@@ -23,7 +23,7 @@ const CardListContainer = ({hasTopTen}: any) => {
     title = `Gösterimdeki ${activeIndex === 0 ? "Filmler" : "Diziler"}`
 
 
-  return <CardList activeIndex={activeIndex} title={title} hasTopTen={hasTopTen} trendingMovies={trendingMovies} nowPlayingMovies={nowPlayingMovies} trendingTv={trendingTv} nowPlayingTv={nowPlayingTv} />;
+  return <CardList navigation={navigation} activeIndex={activeIndex} title={title} hasTopTen={hasTopTen} trendingMovies={trendingMovies} nowPlayingMovies={nowPlayingMovies} trendingTv={trendingTv} nowPlayingTv={nowPlayingTv} />;
 };
 
 export default CardListContainer;

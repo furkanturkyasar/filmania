@@ -1,9 +1,9 @@
 // [External]
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import 'react-native-gesture-handler';
-import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
 import { Provider } from 'react-redux';
 import { store } from './src/app/store';
 
@@ -13,7 +13,9 @@ import {
   StyleSheet,
   View,
   Text,
-  ActivityIndicator
+  ActivityIndicator,
+  Modal,
+  TouchableOpacity
 } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
@@ -26,28 +28,14 @@ import ProfileIcon from 'react-native-vector-icons/Ionicons';
 // [Internal]
 import HomeScreen from './src/pages/main';
 import ExploreScreen from './src/pages/explore';
-import { Colors, Fonts } from './app.json';
+import SavedScreen from './src/pages/saved';
+import { Colors } from './app.json';
 import { Walkthrough } from './src/pages/walkthrough';
 import LoginScreen from './src/pages/login';
 import { FIREBASE_AUTH } from './FireBaseConfig';
+import SearchScreen from './src/pages/search';
+import MediaDetailScreen from './src/pages/mediaDetail';
 
-function Saved() {
-  return (
-    <View style={{ flex: 1 }}>
-      <Text>Saved!</Text>
-      <Text>hello</Text>
-    </View>
-  );
-}
-
-function Search() {
-  return (
-    <View style={{ flex: 1 }}>
-      <Text>Search!</Text>
-      <Text>hello</Text>
-    </View>
-  );
-}
 
 const MainScreens = () => {
   const Tab = createBottomTabNavigator();
@@ -79,13 +67,13 @@ const MainScreens = () => {
               },
               tabBarShowLabel: false
             }} />
-            <Tab.Screen name='Listem' component={Saved} options={{
+            <Tab.Screen name='Listem' component={SavedScreen} options={{
               tabBarIcon: ({focused}) => {
                 return <SavedIcon name='bookmark' size={26} color={focused ? Colors.PrimaryLightColor : Colors.TextColor} />
               },
               tabBarShowLabel: false
             }} />
-            <Tab.Screen name='Arama' component={Search} options={{
+            <Tab.Screen name='Arama' component={SearchScreen} options={{
               tabBarIcon: ({focused}) => {
                 return <SearchIcon name='search' size={26} color={focused ? Colors.PrimaryLightColor : Colors.TextColor} />
               },
@@ -96,12 +84,53 @@ const MainScreens = () => {
   );
 }
 
-
 function HeaderRight() {
+  const [showModal, setShowModal] = useState<boolean>(false);
+
+  const navigation = useNavigation();
+
+  const handleLogout = () => {
+    const auth = getAuth();
+    signOut(auth).then(() => {
+      console.log('User signed out!');
+
+      navigation.reset({ index: 0, routes: [{ name: "Login" }]})
+
+    }).catch((error) => {
+      console.error('Error signing out:', error);
+    });
+  };
+
 
   return (
       <View style={{ width: 34, height: 34, borderRadius: 32, marginRight: 10}}>
-        <ProfileIcon name='person-circle-sharp' color={Colors.TextColor}  size={32} />
+        <TouchableOpacity onPress={() => setShowModal(true)}>
+          <ProfileIcon name='person-circle-sharp' color={Colors.TextColor} size={32} />
+        </TouchableOpacity>
+        <Modal
+          statusBarTranslucent
+          animationType="none"
+          transparent={true}
+          visible={showModal}
+          onRequestClose={() => {
+            setShowModal(!showModal);
+          }}
+        >
+          <TouchableOpacity style={{ flex: 1, justifyContent:'center', alignItems: 'center', backgroundColor: 'rgba(0, 0, 0, 0.5)' }} activeOpacity={1} onPressOut={() => setShowModal(false)}>
+            <View style={styles.modalView}>
+              <TouchableOpacity
+                style={styles.logoutButton}
+                onPress={() => {
+                  handleLogout();
+                  setShowModal(!showModal);
+                }}
+              >
+                <Text style={styles.textStyle}>Çıkış Yap</Text>
+              </TouchableOpacity>
+            </View>
+          </TouchableOpacity>
+          
+        </Modal>
       </View> 
   )
 }
@@ -116,10 +145,9 @@ function App(): React.JSX.Element {
   const [initialRouteName, setInitialRouteName] = useState<string>("Walkthrough");
 
   useEffect(() => {
-
     const auth = getAuth();
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-      console.log("user check: ", user)
+
       if (user) {
         setInitialRouteName('Main');
       } else {
@@ -146,14 +174,15 @@ function App(): React.JSX.Element {
       <GestureHandlerRootView style={{ flex: 1 }}>
         <NavigationContainer>
           <StatusBar translucent barStyle="dark-content" />
-          <Stack.Navigator initialRouteName={initialRouteName} screenOptions={{ headerBackTitleVisible: true }}>
+          <Stack.Navigator initialRouteName={initialRouteName} screenOptions={{ headerBackTitleVisible: true  }}>
                 <Stack.Screen name='Main' component={MainScreens} options={{ 
                         title: "",
                         headerShown: false
-                      }} 
+                      }}
                 />
                 <Stack.Screen name="Walkthrough" component={Walkthrough} options={{ headerShown: false }} />
                 <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
+                <Stack.Screen name="MediaDetail" component={MediaDetailScreen} options={{ headerShown: true, headerTintColor: Colors.TextColor, headerBackTitle: "Geri Dön", title: "Detay", headerStyle: { backgroundColor: Colors.PrimaryDarkColor } }} />
           </Stack.Navigator>
         </NavigationContainer>
       </GestureHandlerRootView>
@@ -172,7 +201,36 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   text: {
-    color: Colors.TextColor
+    color: Colors.TextColor,
+  },
+  modalView: {
+    margin: 12,
+    backgroundColor: Colors.PrimaryDarkColor,
+    borderRadius: 12,
+    padding: 6,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+    position: 'absolute',
+    right: 0,
+    top: 50,
+    justifyContent: 'center',
+  },
+  logoutButton: {
+    borderRadius: 20,
+    padding: 12,
+    elevation: 2,
+  },
+  textStyle: {
+    color: Colors.TextColor,
+    fontWeight: 'bold',
+    textAlign: 'center',
   }
 });
 

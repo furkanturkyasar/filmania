@@ -9,7 +9,7 @@ import { useDispatch } from 'react-redux';
 import { fetchUpcomingMoviesAction, fetchTrendingMoviesAction, fetchNowPlayingMoviesAction } from '../features/movies/moviesActions';
 import { fetchNowPlayingTvAction, fetchTrendingTvAction, fetchUpcomingTvAction } from '../features/tv/tvActions';
 
-export default function HomeScreen() {
+export default function HomeScreen({ navigation, route }: any) {
     const dispatch = useDispatch();
 
     useEffect(() => {
@@ -37,9 +37,9 @@ export default function HomeScreen() {
         <SafeAreaView style={styles.container}>
             <ScrollView showsVerticalScrollIndicator={false} style={styles.wrapper}>
                 <TabMenu />
-                <MainCardContainer />
-                <CardListContainer hasTopTen={true} />
-                <CardListContainer />
+                <MainCardContainer navigation={navigation} />
+                <CardListContainer hasTopTen={true} navigation={navigation} />
+                <CardListContainer navigation={navigation} />
             </ScrollView>
         </SafeAreaView>
     );

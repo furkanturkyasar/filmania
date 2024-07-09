@@ -12,14 +12,16 @@ export interface MainCardProps {
     upcomingMovies?: Media[] | null;
     upcomingTv?: Media[] | null;
     activeIndex: number;
+    navigation?: any;
 }
 
 interface CarouselItemProps {
     media: Media;
     activeIndex: number;
+    navigation?: any;
 }
 
-const MainCard = ({upcomingMovies, upcomingTv, activeIndex}: MainCardProps) => {
+const MainCard = ({upcomingMovies, upcomingTv, activeIndex, navigation}: MainCardProps) => {
 
     if (activeIndex === 0) {
       if (!upcomingMovies || upcomingMovies.length < 1) {
@@ -44,8 +46,7 @@ const MainCard = ({upcomingMovies, upcomingTv, activeIndex}: MainCardProps) => {
           width={400}
           height={400}
           data={activeIndex === 0 ? upcomingMovies ?? [] : upcomingTv ?? []}
-          renderItem={({ item }) => <CarouselItem media={item} activeIndex={activeIndex} />}
-          //onSnapToItem={(index) => index}
+          renderItem={({ item }) => <CarouselItem media={item} activeIndex={activeIndex} navigation={navigation} />}
         />
         <TouchableOpacity
           activeOpacity={0.7}
@@ -63,11 +64,15 @@ const MainCard = ({upcomingMovies, upcomingTv, activeIndex}: MainCardProps) => {
     );
 };
 
-const CarouselItem: React.FC<CarouselItemProps> = ({ media, activeIndex }) => {
+const CarouselItem: React.FC<CarouselItemProps> = ({ media, activeIndex, navigation }) => {
     const imageUrl = `https://image.tmdb.org/t/p/w400${media.poster_path}`;
     
     return (
-      <View key={media.id} style={styles.itemContainer}>
+      <TouchableOpacity onPress={() => 
+        navigation.navigate("MediaDetail", {
+          id: media.id
+      })
+      } key={media.id} style={styles.itemContainer}>
         <Image style={styles.image} source={{ uri: imageUrl }} />
         <LinearGradient colors={['rgba(0,0,0,0)', 'rgba(0,0,0,0.7)']} style={styles.gradient}>
           <Text numberOfLines={2} style={styles.title}>{ activeIndex === 0 ? media.title : (media as any).name}</Text>
@@ -76,7 +81,7 @@ const CarouselItem: React.FC<CarouselItemProps> = ({ media, activeIndex }) => {
             <Text style={styles.ratingText}>{media.vote_average.toFixed(1)}/10</Text>
           </View>
         </LinearGradient>
-      </View>
+      </TouchableOpacity>
     );
   };
   
@@ -100,7 +105,6 @@ const styles = StyleSheet.create({
     },
     arrowButton: {
       position: 'absolute',
-      //top: '50%',
       backgroundColor: 'rgba(0,0,0,0.5)',
       borderRadius: 32,
       padding: 8,
@@ -114,8 +118,6 @@ const styles = StyleSheet.create({
         left: 0, 
         width: "100%", 
         height: 85, 
-        //borderBottomLeftRadius: 8, 
-        //borderBottomRightRadius: 8, 
         padding: 15, 
         paddingTop: 40
     },
